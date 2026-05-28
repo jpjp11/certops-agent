@@ -187,7 +187,12 @@ public class ExposureDiscoveryEngine {
                 openPortNumbers.add(op.port);
             }
 
-            host.put("device_type", guessDeviceType(openPortNumbers, hostname));
+            DeviceClassifier.Result classification = DeviceClassifier.classify(openPortNumbers, hostname, fpByPort);
+            host.put("device_type", classification.deviceType);
+            host.put("device_confidence", classification.confidence);
+            if (classification.vendor != null) host.put("vendor", classification.vendor);
+            if (classification.model != null) host.put("model", classification.model);
+            host.put("device_evidence", classification.evidence);
             host.put("ports", portResults);
             hosts.add(host);
         }
@@ -212,40 +217,6 @@ public class ExposureDiscoveryEngine {
         } catch (Exception e) {
             return null;
         }
-    }
-
-    private String guessDeviceType(List<Integer> ports, String hostname) {
-        Set<Integer> p = new HashSet<>(ports);
-
-        // Hostname-based hints (most reliable)
-        if (hostname != null) {
-            String h = hostname.toLowerCase();
-            if (h.contains("iphone") || h.contains("ipad")) return "mobile";
-            if (h.contains("macbook") || h.contains("imac") || h.contains("mac-mini")) return "mac";
-            if (h.contains("printer") || h.contains("print") || h.contains("hp-") || h.contains("canon") || h.contains("epson") || h.contains("brother")) return "printer";
-            if (h.contains("camera") || h.contains("cam") || h.contains("hikvision") || h.contains("dahua")) return "camera";
-            if (h.contains("synology") || h.contains("qnap") || h.contains("nas")) return "nas";
-            if (h.contains("router") || h.contains("gateway") || h.contains("ubnt") || h.contains("unifi") || h.contains("covr") || h.contains("orbi") || h.contains("eero") || h.contains("draytek") || h.contains("mikrotik") || h.contains("asus") || h.contains("archer")) return "router";
-            if (h.contains("raspberry") || h.contains("pi")) return "raspberry-pi";
-            if (h.contains("android") || h.contains("samsung") || h.contains("pixel")) return "mobile";
-        }
-
-        // Port-based heuristics
-        if (p.contains(554) || p.contains(8554)) return "camera";
-        if (p.contains(9100) || (p.contains(631) && p.size() <= 4)) return "printer";
-        if (p.contains(62078)) return "mobile";
-        if (p.contains(548)) return "mac";
-        if (p.contains(3389)) return "windows";
-        if (p.contains(445) && p.contains(135)) return "windows";
-        if (p.contains(5000) && p.contains(5001) && p.size() <= 6) return "nas";
-        if (p.contains(22) && p.contains(80) && p.contains(443) && p.size() <= 5) return "router";
-        if (p.contains(53) && (p.contains(80) || p.contains(443))) return "router";
-        if (p.contains(53) && p.size() <= 3) return "router";
-        if (p.contains(1883) || p.contains(8883)) return "iot";
-        if (p.contains(22) && p.size() <= 3) return "linux";
-        if (p.contains(80) || p.contains(443)) return "server";
-
-        return "unknown";
     }
 
     private void reportComplete(String runId, List<Map<String, Object>> hosts, String error) {
