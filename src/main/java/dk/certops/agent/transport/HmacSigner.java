@@ -11,7 +11,6 @@ import java.util.Base64;
 
 /**
  * HMAC-SHA256 request signing for additional transport security.
- * Phase 2 feature — ready for integration.
  */
 @Component
 public class HmacSigner {

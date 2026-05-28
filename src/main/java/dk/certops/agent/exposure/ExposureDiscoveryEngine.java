@@ -156,7 +156,7 @@ public class ExposureDiscoveryEngine {
             Map<String, Object> host = new LinkedHashMap<>();
             host.put("ip", ip);
 
-            // Reverse DNS — gives names like jacobs-macbook.local, hp-printer.home
+            // Reverse DNS lookup — resolves IP to hostname if available
             String hostname = reverseDns(ip);
             if (hostname != null) host.put("hostname", hostname);
 
