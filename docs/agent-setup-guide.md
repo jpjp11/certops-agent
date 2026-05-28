@@ -140,7 +140,7 @@ You must create a collector registration in CertControl before installing anythi
 
 The API key looks like:
 ```
-cwc_H7mnZTsYYqkDe9ir2WoWPJcHXnXDxWNI3Itbw6dIdqyeHKit
+cwc_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
 ---
