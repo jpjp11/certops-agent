@@ -1,0 +1,16 @@
+Business Source License 1.1
+
+Licensor: Certiva ApS
+Licensed Work: CertControl Pro Agent
+Change Date: 2029-01-01
+Change License: Apache License, Version 2.0
+
+Use Limitation: You may not use the Licensed Work for a commercial offering
+that competes with CertControl Pro (https://certcontrol.pro).
+
+You may use, copy, modify, and distribute the Licensed Work for the purpose
+of auditing, evaluating, and running it as part of a CertControl Pro
+subscription. Building from source for personal or internal use is permitted.
+
+For more information about the Business Source License, visit:
+https://mariadb.com/bsl11/

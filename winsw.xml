@@ -1,0 +1,81 @@
+<!--
+  CertControl Pro Agent — WinSW service definition template
+
+  This file is a standalone reference. The install.ps1 script generates
+  a tailored version at C:\certops-agent\certops-agent.xml automatically.
+
+  Manual usage:
+    1. Copy this file to C:\certops-agent\certops-agent.xml
+    2. Place certops-agent-1.0.0.jar in C:\certops-agent\
+    3. Download WinSW and rename to C:\certops-agent\certops-agent.exe
+    4. Adjust paths and environment variables below
+    5. Run: certops-agent.exe install
+    6. Run: certops-agent.exe start
+
+  WinSW: https://github.com/winsw/winsw
+-->
+<service>
+  <id>certops-agent</id>
+  <name>CertControl Pro Agent</name>
+  <description>On-premise TLS scanner agent for CertControl Pro</description>
+
+  <!-- Java executable — adjust to your Java 17+ installation -->
+  <executable>C:\Program Files\Eclipse Adoptium\jdk-17\bin\java.exe</executable>
+  <arguments>-Xms64m -Xmx256m -jar "C:\certops-agent\certops-agent-1.0.0.jar" --spring.config.additional-location=file:C:\certops-agent\application.yml</arguments>
+
+  <!-- Log rotation: 50 MB per file, keep 7 files -->
+  <logpath>C:\certops-agent\logs</logpath>
+  <log mode="roll-by-size">
+    <sizeThreshold>52428800</sizeThreshold>
+    <keepFiles>7</keepFiles>
+  </log>
+
+  <!-- Start automatically after boot (delayed to reduce boot contention) -->
+  <startmode>Automatic</startmode>
+  <delayedAutoStart>true</delayedAutoStart>
+
+  <!-- Restart on failure after 10 seconds, reset failure counter after 1 hour -->
+  <onfailure action="restart" delay="10 sec" />
+  <resetfailure>1 hour</resetfailure>
+
+  <!-- ─── Environment Variables ─────────────────────────────── -->
+  <!-- REQUIRED: CertControl Pro cloud URL -->
+  <env name="CERTOPS_SERVER_URL" value="https://certcontrol.pro" />
+
+  <!-- REQUIRED: API key issued from CertControl Pro admin panel -->
+  <env name="CERTOPS_API_KEY" value="" />
+
+  <!-- Optional: HTTPS proxy for outbound connections -->
+  <!-- <env name="HTTPS_PROXY" value="http://proxy.corp:8080" /> -->
+
+  <!-- Scan intervals (seconds) -->
+  <!-- <env name="CERTOPS_SCAN_INTERVAL" value="300" /> -->
+  <!-- <env name="CERTOPS_HEARTBEAT_INTERVAL" value="60" /> -->
+  <!-- <env name="CERTOPS_CONFIG_PULL_INTERVAL" value="300" /> -->
+
+  <!-- Scan options -->
+  <!-- <env name="CERTOPS_TIMEOUT_MS" value="10000" /> -->
+  <!-- <env name="CERTOPS_PROBE_TLS" value="true" /> -->
+  <!-- <env name="CERTOPS_CHECK_OCSP" value="true" /> -->
+  <!-- <env name="CERTOPS_CHECK_HTTP_HEADERS" value="true" /> -->
+
+  <!-- Hostname redaction — mask sensitive hostnames before upload -->
+  <!-- <env name="CERTOPS_REDACTION_ENABLED" value="true" /> -->
+  <!-- <env name="CERTOPS_REDACTION_PATTERNS" value="*.local,*.internal" /> -->
+  <!-- <env name="CERTOPS_STRIP_PEM" value="false" /> -->
+
+  <!-- Spool — offline queue when cloud is unreachable -->
+  <!-- <env name="CERTOPS_SPOOL_ENABLED" value="true" /> -->
+  <!-- <env name="CERTOPS_SPOOL_DIR" value="C:\certops-agent\spool" /> -->
+  <!-- <env name="CERTOPS_SPOOL_MAX_MB" value="100" /> -->
+  <!-- <env name="CERTOPS_SPOOL_RETRY" value="60" /> -->
+
+  <!-- CIDR subnet discovery -->
+  <!-- <env name="CERTOPS_CIDR_ENABLED" value="false" /> -->
+
+  <!-- mTLS client certificate authentication -->
+  <!-- <env name="CERTOPS_MTLS_ENABLED" value="false" /> -->
+  <!-- <env name="CERTOPS_MTLS_CERT" value="C:\certops-agent\certs\client.pem" /> -->
+  <!-- <env name="CERTOPS_MTLS_KEY" value="C:\certops-agent\certs\client.key" /> -->
+  <!-- <env name="CERTOPS_MTLS_CA" value="C:\certops-agent\certs\ca.pem" /> -->
+</service>

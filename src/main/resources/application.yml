@@ -1,0 +1,46 @@
+server:
+  port: 0
+
+certops:
+  agent:
+    server-url: ${CERTOPS_SERVER_URL:https://certcontrol.pro}
+    api-key: ${CERTOPS_API_KEY:}
+    proxy-url: ${HTTPS_PROXY:}
+
+    scan-interval-seconds: ${CERTOPS_SCAN_INTERVAL:300}
+    heartbeat-interval-seconds: ${CERTOPS_HEARTBEAT_INTERVAL:60}
+    config-pull-interval-seconds: ${CERTOPS_CONFIG_PULL_INTERVAL:300}
+
+    timeout-ms: ${CERTOPS_TIMEOUT_MS:10000}
+    probe-tls-versions: ${CERTOPS_PROBE_TLS:true}
+    check-ocsp: ${CERTOPS_CHECK_OCSP:true}
+    check-http-headers: ${CERTOPS_CHECK_HTTP_HEADERS:true}
+
+    redaction:
+      enabled: ${CERTOPS_REDACTION_ENABLED:true}
+      patterns: ${CERTOPS_REDACTION_PATTERNS:}
+      strip-cert-pem: ${CERTOPS_STRIP_PEM:false}
+
+    spool:
+      enabled: ${CERTOPS_SPOOL_ENABLED:true}
+      directory: ${CERTOPS_SPOOL_DIR:/var/certops-agent/spool}
+      max-size-mb: ${CERTOPS_SPOOL_MAX_MB:100}
+      retry-interval-seconds: ${CERTOPS_SPOOL_RETRY:60}
+
+    cidr-discovery:
+      enabled: ${CERTOPS_CIDR_ENABLED:false}
+      ports: 443,8443,9443,636
+      rate-limit: 10
+      concurrency: 5
+
+    mtls:
+      enabled: ${CERTOPS_MTLS_ENABLED:false}
+      cert-path: ${CERTOPS_MTLS_CERT:}
+      key-path: ${CERTOPS_MTLS_KEY:}
+      ca-path: ${CERTOPS_MTLS_CA:}
+
+logging:
+  level:
+    dk.certops.agent: INFO
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
