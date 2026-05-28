@@ -78,6 +78,20 @@ Your network
 
 ---
 
+## Verifying the JAR
+
+Before running the agent, verify the JAR matches this release:
+
+```bash
+shasum -a 256 certcontrol-agent-1.2.0.jar
+# Expected: 6eece13877dd446739319a9bf064ce5f29c76a79a024f3289de7355d3ac28612
+```
+
+The SHA-256 checksum is also shown in the agent setup page in your CertControl account.
+A `certops-agent-1.2.0.jar.sha256` file is included in this repository for scripted verification.
+
+---
+
 ## Building from source
 
 Requires Java 17 and Maven 3.8+.
