@@ -19,7 +19,7 @@ SPOOL_DIR="/var/certops-agent/spool"
 LOG_DIR="/var/log/certops-agent"
 CONF_DIR="/etc/certops-agent"
 UNIT_FILE="/etc/systemd/system/${SERVICE_NAME}.service"
-JAR_NAME="certops-agent-1.0.0.jar"
+JAR_NAME="certops-agent-1.3.0.jar"
 
 # ── Colour helpers ────────────────────────────────────────────
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; NC='\033[0m'

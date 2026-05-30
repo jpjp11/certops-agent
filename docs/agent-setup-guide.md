@@ -1,6 +1,6 @@
 # CertControl Pro Agent — Complete Setup Guide
 
-> **Version:** 1.2.0 | **Java required:** 17+ | **Platforms:** Linux, Windows
+> **Version:** 1.3.0 | **Java required:** 17+ | **Platforms:** Linux, Windows
 
 This guide covers everything you need to install, configure, and operate the CertControl on-premise agent — from registering a collector through to running Exposure Discovery.
 
@@ -65,7 +65,7 @@ The agent source code is publicly available so you can verify exactly what runs 
 
 **Source code:** https://github.com/jpjp11/certops-agent
 
-**SHA-256 checksum for v1.2.0:**
+**SHA-256 checksum for v1.3.0:**
 ```
 6eece13877dd446739319a9bf064ce5f29c76a79a024f3289de7355d3ac28612
 ```
@@ -74,10 +74,10 @@ After downloading the JAR, verify it before running:
 
 ```bash
 # Linux / macOS
-shasum -a 256 certcontrol-agent-1.2.0.jar
+shasum -a 256 certops-agent-1.3.0.jar
 
 # Windows (PowerShell)
-Get-FileHash certcontrol-agent-1.2.0.jar -Algorithm SHA256 | Select-Object Hash
+Get-FileHash certops-agent-1.3.0.jar -Algorithm SHA256 | Select-Object Hash
 ```
 
 The expected hash is also shown in CertControl under **Infrastructure → Collectors → Download Agent**.
@@ -89,7 +89,7 @@ git clone https://github.com/jpjp11/certops-agent.git
 cd certops-agent
 # Requires Java 17 and Maven 3.8+
 mvn clean package -DskipTests
-# JAR is at target/certops-agent-1.2.0.jar
+# JAR is at target/certops-agent-1.3.0.jar
 ```
 
 ---
@@ -150,7 +150,7 @@ cwc_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 Go to **Infrastructure → Collectors → Download Agent** in CertControl.
 
 You can download:
-- `certcontrol-agent-1.2.0.jar` — the agent JAR (for Docker or bare-metal installation)
+- `certops-agent-1.3.0.jar` — the agent JAR (for Docker or bare-metal installation)
 - `Dockerfile` — to build a Docker image locally
 - `docker-compose.yml` — pre-filled with your server URL and a placeholder for your API key
 
@@ -173,14 +173,14 @@ Build the Docker image from the downloaded JAR and Dockerfile, then run it.
 ```bash
 mkdir -p /opt/certcontrol-agent
 cd /opt/certcontrol-agent
-# Copy certcontrol-agent-1.2.0.jar and Dockerfile here
+# Copy certops-agent-1.3.0.jar and Dockerfile here
 ```
 
 **Step 2 — Build the image:**
 
 ```bash
-docker build -t certcontrol-agent:1.2.0 .
-docker tag certcontrol-agent:1.2.0 certcontrol-agent:latest
+docker build -t certcontrol-agent:1.3.0 .
+docker tag certcontrol-agent:1.3.0 certcontrol-agent:latest
 ```
 
 **Step 3 — Run the agent:**
@@ -281,7 +281,7 @@ For Linux servers without Docker. The included `install.sh` script handles every
 **Step 1 — Transfer files to the target server:**
 
 ```bash
-scp certcontrol-agent-1.2.0.jar install.sh user@server:/tmp/
+scp certops-agent-1.3.0.jar install.sh user@server:/tmp/
 ```
 
 **Step 2 — Run the installer as root:**
@@ -380,7 +380,7 @@ For Windows Server environments. The included `install.ps1` script installs the 
 
 **Step 1 — Transfer files to the target server:**
 
-Copy `certcontrol-agent-1.2.0.jar` and `install.ps1` to the same directory on the server, e.g. `C:\install\`.
+Copy `certops-agent-1.3.0.jar` and `install.ps1` to the same directory on the server, e.g. `C:\install\`.
 
 **Step 2 — Run the installer as Administrator:**
 
@@ -465,7 +465,7 @@ Get-Content C:\certops-agent\logs\agent.log -Tail 30 -Wait
 If `install.ps1` cannot be used, install manually using the included `winsw.xml` as a template:
 
 1. Create `C:\certops-agent\`
-2. Copy `certcontrol-agent-1.2.0.jar` there
+2. Copy `certops-agent-1.3.0.jar` there
 3. Download WinSW and save as `C:\certops-agent\certops-agent.exe`
 4. Copy `winsw.xml` to `C:\certops-agent\certops-agent.xml`, fill in paths and environment variables
 5. Run: `certops-agent.exe install` then `certops-agent.exe start`
@@ -895,8 +895,8 @@ The proxy is used only for connections to CertControl. Connections to internal s
 
 ```bash
 # Rebuild the image with the new JAR
-docker build -t certcontrol-agent:1.2.0 .
-docker tag certcontrol-agent:1.2.0 certcontrol-agent:latest
+docker build -t certcontrol-agent:1.3.0 .
+docker tag certcontrol-agent:1.3.0 certcontrol-agent:latest
 
 # Stop and replace the container (spool volume is preserved)
 docker stop certcontrol-agent
@@ -1048,7 +1048,7 @@ For large target counts, increase the JVM heap. For Docker:
 For systemd, edit the `ExecStart` line in `/etc/systemd/system/certops-agent.service`:
 
 ```
-ExecStart=/usr/bin/java -Xmx512m -jar /opt/certops-agent/certops-agent-1.2.0.jar ...
+ExecStart=/usr/bin/java -Xmx512m -jar /opt/certops-agent/certops-agent-1.3.0.jar ...
 ```
 
 | Target count | Recommended heap |
@@ -1144,7 +1144,7 @@ The agent transmits only the following data via outbound HTTPS:
 
 ```json
 {
-  "agent_version": "1.2.0",
+  "agent_version": "1.3.0",
   "hostname": "prod-scanner-01",
   "ip_address": "10.0.1.50",
   "endpoint_count": 12,
