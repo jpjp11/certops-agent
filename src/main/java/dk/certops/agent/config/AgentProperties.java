@@ -12,6 +12,9 @@ public class AgentProperties {
 
     private String serverUrl = "https://certcontrol.pro";
     private String apiKey = "";
+    // Per-collector HMAC signing secret (shown once at collector creation/regeneration).
+    // When set, requests are signed (X-Timestamp/X-Nonce/X-Signature) and verified server-side.
+    private String signingSecret = "";
     private String proxyUrl = "";
 
     private int scanIntervalSeconds = 300;
@@ -40,6 +43,9 @@ public class AgentProperties {
 
     public String getApiKey() { return apiKey; }
     public void setApiKey(String apiKey) { this.apiKey = apiKey; }
+
+    public String getSigningSecret() { return signingSecret; }
+    public void setSigningSecret(String signingSecret) { this.signingSecret = signingSecret; }
 
     public String getProxyUrl() { return proxyUrl; }
     public void setProxyUrl(String proxyUrl) { this.proxyUrl = proxyUrl; }

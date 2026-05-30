@@ -64,6 +64,7 @@ public class AgentSchedulerService {
                                  DnsSecurityChecker dnsSecurityChecker,
                                  OcspCrlChecker ocspCrlChecker,
                                  RedactionService redactionService,
+                                 dk.certops.agent.security.FieldAllowlistFilter fieldAllowlistFilter,
                                  CloudClientService cloudClientService,
                                  LocalSpoolService localSpoolService,
                                  DeliveryLog deliveryLog,
@@ -80,7 +81,8 @@ public class AgentSchedulerService {
         this.localSpoolService = localSpoolService;
         this.deliveryLog = deliveryLog;
         this.objectMapper = objectMapper;
-        this.exposureEngine = new ExposureDiscoveryEngine(cloudClientService, agentProperties.isAllowPublicTargets());
+        this.exposureEngine = new ExposureDiscoveryEngine(cloudClientService, agentProperties.isAllowPublicTargets(),
+                redactionService, fieldAllowlistFilter);
 
         // Security posture logging + cloud alert for non-default configuration
         if (agentProperties.isAllowPublicTargets()) {

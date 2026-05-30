@@ -166,14 +166,9 @@ public class CloudClientService {
                 .timeout(Duration.ofSeconds(30))
                 .POST(HttpRequest.BodyPublishers.ofString(json, StandardCharsets.UTF_8));
 
-        // HMAC signing
-        String apiKey = agentProperties.getApiKey();
-        if (apiKey != null && !apiKey.isBlank()) {
-            String signature = hmacSigner.sign(json, apiKey);
-            if (signature != null) {
-                reqBuilder.header("X-Signature", signature);
-            }
-        }
+        // HMAC request signing (replay-protected): signs timestamp+nonce+method+path+body
+        // with the per-collector signing secret. Verified server-side.
+        addSignatureHeaders(reqBuilder, "POST", path, json);
 
         HttpRequest request = reqBuilder.build();
 
@@ -198,12 +193,13 @@ public class CloudClientService {
     public Map<String, Object> get(String path) throws IOException, InterruptedException {
         String url = agentProperties.getServerUrl() + path;
 
-        HttpRequest request = HttpRequest.newBuilder()
+        HttpRequest.Builder reqBuilder = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .header("Authorization", "Bearer " + agentProperties.getApiKey())
                 .timeout(Duration.ofSeconds(30))
-                .GET()
-                .build();
+                .GET();
+        addSignatureHeaders(reqBuilder, "GET", path, "");
+        HttpRequest request = reqBuilder.build();
 
         log.debug("GET {}", path);
 
@@ -213,6 +209,29 @@ public class CloudClientService {
             return objectMapper.readValue(response.body(), Map.class);
         } else {
             throw new IOException("HTTP " + response.statusCode() + ": " + response.body());
+        }
+    }
+
+    /**
+     * Adds replay-protected HMAC signature headers when a signing secret is configured.
+     * Signs the canonical string {@code timestamp\nnonce\nMETHOD\npath\nbody}. When no
+     * signing secret is set the request is sent unsigned (legacy mode); the server graces
+     * such requests unless its require-signature flag is enabled.
+     */
+    private void addSignatureHeaders(HttpRequest.Builder builder, String method, String path, String body) {
+        String secret = agentProperties.getSigningSecret();
+        if (secret == null || secret.isBlank()) {
+            return;
+        }
+        String timestamp = String.valueOf(System.currentTimeMillis() / 1000L);
+        String nonce = java.util.UUID.randomUUID().toString();
+        String canonical = timestamp + "\n" + nonce + "\n" + method.toUpperCase() + "\n"
+                + path + "\n" + (body == null ? "" : body);
+        String signature = hmacSigner.sign(canonical, secret);
+        if (signature != null) {
+            builder.header("X-Timestamp", timestamp)
+                   .header("X-Nonce", nonce)
+                   .header("X-Signature", signature);
         }
     }
 

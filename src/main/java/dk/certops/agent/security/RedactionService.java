@@ -70,6 +70,16 @@ public class RedactionService {
     }
 
     /**
+     * Redact a single hostname (e.g. from exposure-discovery reverse DNS) if it matches a
+     * configured pattern. Returns {@code [maskeret]} on a match, otherwise the original value.
+     */
+    public String redactHostname(String hostname) {
+        if (hostname == null) return null;
+        if (!agentProperties.getRedaction().isEnabled()) return hostname;
+        return matchesAnyPattern(hostname) ? REDACTED : hostname;
+    }
+
+    /**
      * Update cloud-pushed redaction patterns.
      */
     public void updateCloudPatterns(List<String> patterns) {

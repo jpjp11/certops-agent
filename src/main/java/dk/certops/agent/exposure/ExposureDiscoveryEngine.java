@@ -1,6 +1,8 @@
 package dk.certops.agent.exposure;
 
+import dk.certops.agent.security.FieldAllowlistFilter;
 import dk.certops.agent.security.NetworkValidator;
+import dk.certops.agent.security.RedactionService;
 import dk.certops.agent.transport.CloudClientService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,11 +18,17 @@ public class ExposureDiscoveryEngine {
 
     private final CloudClientService cloudClient;
     private final boolean allowPublicTargets;
+    private final RedactionService redactionService;
+    private final FieldAllowlistFilter fieldAllowlistFilter;
     private final AtomicBoolean running = new AtomicBoolean(false);
 
-    public ExposureDiscoveryEngine(CloudClientService cloudClient, boolean allowPublicTargets) {
+    public ExposureDiscoveryEngine(CloudClientService cloudClient, boolean allowPublicTargets,
+                                   RedactionService redactionService,
+                                   FieldAllowlistFilter fieldAllowlistFilter) {
         this.cloudClient = cloudClient;
         this.allowPublicTargets = allowPublicTargets;
+        this.redactionService = redactionService;
+        this.fieldAllowlistFilter = fieldAllowlistFilter;
     }
 
     public boolean isRunning() {
@@ -156,9 +164,11 @@ public class ExposureDiscoveryEngine {
             Map<String, Object> host = new LinkedHashMap<>();
             host.put("ip", ip);
 
-            // Reverse DNS lookup — resolves IP to hostname if available
+            // Reverse DNS lookup — resolves IP to hostname if available.
+            // Keep the real hostname locally for device classification, but redact it
+            // (per configured patterns) before it is stored/egressed.
             String hostname = reverseDns(ip);
-            if (hostname != null) host.put("hostname", hostname);
+            if (hostname != null) host.put("hostname", redactionService.redactHostname(hostname));
 
             List<Map<String, Object>> portResults = new ArrayList<>();
             List<Map<String, Object>> fpForHost = fingerprintResults.getOrDefault(ip, List.of());
@@ -221,9 +231,15 @@ public class ExposureDiscoveryEngine {
 
     private void reportComplete(String runId, List<Map<String, Object>> hosts, String error) {
         try {
+            // Defense-in-depth: strip every host/port record to the allowlisted fields
+            // before egress, so no unexpected captured data leaves the network.
+            List<Map<String, Object>> safeHosts = new ArrayList<>();
+            for (Map<String, Object> h : hosts) {
+                safeHosts.add(fieldAllowlistFilter.filterExposureHost(h));
+            }
             Map<String, Object> payload = new LinkedHashMap<>();
             payload.put("run_id", runId);
-            payload.put("hosts", hosts);
+            payload.put("hosts", safeHosts);
             if (error != null) payload.put("error", error);
             cloudClient.post("/api/collector/exposure/complete", payload);
         } catch (Exception e) {

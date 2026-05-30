@@ -110,10 +110,15 @@ public final class NetworkValidator {
     }
 
     private static boolean isPrivateAddress(InetAddress addr) {
-        if (addr.isLoopbackAddress()) return true;
-        if (addr.isSiteLocalAddress()) return true;   // 10/8, 172.16/12, 192.168/16
-        if (addr.isLinkLocalAddress()) return true;    // 169.254/16, fe80::/10
-        if (addr.isAnyLocalAddress()) return true;     // 0.0.0.0
+        // Loopback, link-local and any-local are NOT valid scan targets — scanning them
+        // reaches the agent host itself or the cloud metadata endpoint (169.254.169.254).
+        // They are explicitly excluded so a cloud-pushed config cannot redirect the agent there.
+        if (addr.isLoopbackAddress()) return false;    // 127.0.0.0/8, ::1
+        if (addr.isLinkLocalAddress()) return false;   // 169.254.0.0/16 (incl. metadata), fe80::/10
+        if (addr.isAnyLocalAddress()) return false;    // 0.0.0.0
+        if (addr.isMulticastAddress()) return false;
+
+        if (addr.isSiteLocalAddress()) return true;    // 10/8, 172.16/12, 192.168/16
 
         byte[] bytes = addr.getAddress();
         if (bytes.length == 4) {
@@ -127,20 +132,17 @@ public final class NetworkValidator {
     }
 
     private static boolean isPrivateIpv4(int ip) {
+        // NOTE: loopback (127/8), link-local (169.254/16) and 0.0.0.0/8 are intentionally
+        // NOT treated as scannable — they are rejected in isPrivateAddress above and must
+        // also be excluded here so CIDRs covering them are rejected by isPrivateCidr.
         // 10.0.0.0/8
         if ((ip & 0xFF000000) == 0x0A000000) return true;
         // 172.16.0.0/12
         if ((ip & 0xFFF00000) == 0xAC100000) return true;
         // 192.168.0.0/16
         if ((ip & 0xFFFF0000) == 0xC0A80000) return true;
-        // 127.0.0.0/8 (loopback)
-        if ((ip & 0xFF000000) == 0x7F000000) return true;
-        // 169.254.0.0/16 (link-local)
-        if ((ip & 0xFFFF0000) == 0xA9FE0000) return true;
         // 100.64.0.0/10 (CGN / RFC6598)
         if ((ip & 0xFFC00000) == 0x64400000) return true;
-        // 0.0.0.0/8
-        if ((ip & 0xFF000000) == 0x00000000) return true;
         return false;
     }
 
