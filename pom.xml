@@ -13,7 +13,7 @@
 
     <groupId>dk.certops</groupId>
     <artifactId>certops-agent</artifactId>
-    <version>1.3.0</version>
+    <version>1.3.1</version>
     <name>CertWatch Pro Agent</name>
     <description>On-premise TLS scanner agent for CertWatch Pro</description>
 

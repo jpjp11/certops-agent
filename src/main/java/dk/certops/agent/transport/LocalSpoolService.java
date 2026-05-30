@@ -60,9 +60,22 @@ public class LocalSpoolService {
 
         try {
             objectMapper.writeValue(file.toFile(), scanBatch);
+            restrictPermissions(file);
             log.info("Spooled scan batch: {}", filename);
         } catch (IOException e) {
             log.error("Failed to spool scan batch: {}", e.getMessage());
+        }
+    }
+
+    /** Restrict a spooled file to owner-only (600) — it may contain internal scan data. */
+    private void restrictPermissions(Path file) {
+        try {
+            Files.setPosixFilePermissions(file, java.util.Set.of(
+                    java.nio.file.attribute.PosixFilePermission.OWNER_READ,
+                    java.nio.file.attribute.PosixFilePermission.OWNER_WRITE));
+        } catch (UnsupportedOperationException | IOException e) {
+            // Non-POSIX filesystem (e.g. Windows) — fall back to directory ACLs.
+            log.debug("Could not set spool file permissions to 600: {}", e.getMessage());
         }
     }
 

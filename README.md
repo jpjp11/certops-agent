@@ -83,12 +83,12 @@ Your network
 Before running the agent, verify the JAR matches this release:
 
 ```bash
-shasum -a 256 certops-agent-1.3.0.jar
+shasum -a 256 certops-agent-1.3.1.jar
 # Expected: 6eece13877dd446739319a9bf064ce5f29c76a79a024f3289de7355d3ac28612
 ```
 
 The SHA-256 checksum is also shown in the agent setup page in your CertControl account.
-A `certops-agent-1.3.0.jar.sha256` file is included in this repository for scripted verification.
+A `certops-agent-1.3.1.jar.sha256` file is included in this repository for scripted verification.
 
 ---
 
