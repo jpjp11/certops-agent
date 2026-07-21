@@ -35,6 +35,19 @@ public class AgentSchedulerService {
 
     private static final Logger log = LoggerFactory.getLogger(AgentSchedulerService.class);
 
+    /**
+     * Agent version, read from the jar manifest (Implementation-Version, stamped by the
+     * Spring Boot build plugin) — the same source Spring Boot uses for its "v1.4.0" startup
+     * line, so it is always correct without a hardcoded constant to keep in sync.
+     */
+    static final String AGENT_VERSION = resolveAgentVersion();
+
+    private static String resolveAgentVersion() {
+        Package p = dk.certops.agent.CertopsAgentApplication.class.getPackage();
+        String v = p != null ? p.getImplementationVersion() : null;
+        return (v != null && !v.isBlank()) ? v : "unknown";
+    }
+
     private final AgentProperties agentProperties;
     private final StaticTargetProvider staticTargetProvider;
     private final CidrDiscoveryProvider cidrDiscoveryProvider;
@@ -137,7 +150,7 @@ public class AgentSchedulerService {
 
         try {
             Map<String, Object> diagnostics = new LinkedHashMap<>();
-            diagnostics.put("agent_version", "1.2.0");
+            diagnostics.put("agent_version", AGENT_VERSION);
             try {
                 diagnostics.put("hostname", InetAddress.getLocalHost().getHostName());
                 diagnostics.put("ip_address", InetAddress.getLocalHost().getHostAddress());

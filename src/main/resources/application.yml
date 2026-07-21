@@ -1,5 +1,5 @@
-server:
-  port: 0
+# No server: section — the agent is a non-web Spring Boot app. It exposes no HTTP
+# endpoints and reaches the cloud outbound only, so it binds no listening port.
 
 certops:
   agent:

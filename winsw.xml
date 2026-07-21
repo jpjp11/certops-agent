@@ -6,7 +6,7 @@
 
   Manual usage:
     1. Copy this file to C:\certops-agent\certops-agent.xml
-    2. Place certops-agent-1.3.1.jar in C:\certops-agent\
+    2. Place certops-agent-1.4.0.jar in C:\certops-agent\
     3. Download WinSW and rename to C:\certops-agent\certops-agent.exe
     4. Adjust paths and environment variables below
     5. Run: certops-agent.exe install
@@ -21,7 +21,7 @@
 
   <!-- Java executable — adjust to your Java 17+ installation -->
   <executable>C:\Program Files\Eclipse Adoptium\jdk-17\bin\java.exe</executable>
-  <arguments>-Xms64m -Xmx256m -jar "C:\certops-agent\certops-agent-1.3.1.jar" --spring.config.additional-location=file:C:\certops-agent\application.yml</arguments>
+  <arguments>-Xms64m -Xmx256m -jar "C:\certops-agent\certops-agent-1.4.0.jar" --spring.config.additional-location=file:C:\certops-agent\application.yml</arguments>
 
   <!-- Log rotation: 50 MB per file, keep 7 files -->
   <logpath>C:\certops-agent\logs</logpath>
